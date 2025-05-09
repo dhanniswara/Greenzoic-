@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoRewards - Aplikasi Kiosk Digital Sampah</title>
+    <title>EcoDrop - Aplikasi Kiosk Digital Sampah</title>
     <style>
         :root {
-            --primary: #4CAF50;
-            --secondary: #2E7D32;
+            --primary: #2e7d32;
+            --secondary: #4caf50;
             --accent: #8bc34a;
             --light: #f1f8e9;
             --dark: #1b5e20;
-            --gray: #f5f5f5;
+            --gray: #e0e0e0;
             --white: #ffffff;
-            --shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         * {
@@ -25,6 +24,586 @@
         
         body {
             background-color: #f9f9f9;
+        }
+        
+        /* Page Navigation Styles */
+        .app-page {
+            display: none;
+            padding-bottom: 70px; /* Space for bottom nav */
+        }
+        
+        .active-page {
+            display: block;
+        }
+        
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            margin: 1rem 0;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid var(--gray);
+            border-radius: 25px 0 0 25px;
+            outline: none;
+        }
+        
+        .search-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 0 25px 25px 0;
+            cursor: pointer;
+        }
+        
+        /* Filter Options */
+        .filter-options {
+            display: flex;
+            margin: 1rem 0;
+            align-items: center;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        
+        .filter-label {
+            margin-right: 0.5rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .filter-badge {
+            background-color: var(--gray);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .filter-badge.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            color: white;
+        }
+        
+        .available {
+            background-color: #4caf50;
+        }
+        
+        .busy {
+            background-color: #ff9800;
+        }
+        
+        .maintenance {
+            background-color: #f44336;
+        }
+        
+        .waste-type {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .kiosk-status {
+            display: flex;
+            align-items: center;
+            margin-top: 0.3rem;
+        }
+        
+        .direction-btn {
+            background-color: var(--light);
+            color: var(--primary);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .sub-title {
+            margin: 1rem 0 0.5rem;
+            color: var(--dark);
+        }
+        
+        .tips-list {
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .tips-list li {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .info-card {
+            background-color: var(--light);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+        
+        /* Rewards Page Styles */
+        .rewards-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .points-large h2 {
+            font-size: 3rem;
+            color: var(--dark);
+            margin-bottom: 0.2rem;
+        }
+        
+        .level-info {
+            margin-top: 1rem;
+            width: 100%;
+        }
+        
+        .level-badge {
+            background-color: var(--primary);
+            color: white;
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: var(--gray);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--accent);
+        }
+        
+        .category-icons {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 10px;
+            min-width: 70px;
+        }
+        
+        .category-item.active {
+            background-color: var(--light);
+        }
+        
+        .category-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .reward-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .reward-image {
+            position: relative;
+        }
+        
+        .reward-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .reward-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: var(--accent);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+        
+        .reward-details {
+            padding: 0.8rem;
+        }
+        
+        .reward-details h4 {
+            margin-bottom: 0.2rem;
+            font-size: 0.9rem;
+        }
+        
+        .reward-details p {
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .reward-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        
+        .reward-price {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        
+        .claim-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .promo-banner {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .promo-banner h4 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .promo-btn {
+            background-color: white;
+            color: var(--primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin-top: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .small-btn {
+            background-color: var(--light);
+            color: var(--primary);
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        /* Profile Page Styles */
+        .profile-header {
+            padding: 0;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .profile-cover {
+            height: 100px;
+            overflow: hidden;
+        }
+        
+        .profile-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-main {
+            position: relative;
+            padding: 0 1rem 1rem;
+        }
+        
+        .profile-pic-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: -40px auto 0.5rem;
+            border: 4px solid white;
+        }
+        
+        .profile-title {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .edit-profile-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: var(--light);
+            color: var(--primary);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .achievement-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .achievement-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .achievement-name {
+            font-size: 0.75rem;
+        }
+        
+        .achievement-item.unlocked .achievement-icon {
+            background-color: var(--light);
+            color: var(--primary);
+        }
+        
+        .stats-graph {
+            margin: 1rem 0;
+        }
+        
+        .stats-graph img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .stats-details {
+            margin: 1rem 0;
+        }
+        
+        .stat-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+        
+        .stat-label {
+            width: 100px;
+            font-size: 0.9rem;
+        }
+        
+        .stat-bar {
+            flex: 1;
+            height: 10px;
+            background-color: var(--gray);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0 1rem;
+        }
+        
+        .stat-progress {
+            height: 100%;
+        }
+        
+        .organic {
+            background-color: #8bc34a;
+        }
+        
+        .plastic {
+            background-color: #2196f3;
+        }
+        
+        .paper {
+            background-color: #ff9800;
+        }
+        
+        .other {
+            background-color: #9c27b0;
+        }
+        
+        .impact-info {
+            background-color: var(--light);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+        }
+        
+        .impact-items {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .impact-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .impact-value {
+            display: block;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .settings-list {
+            list-style: none;
+        }
+        
+        .settings-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .settings-icon {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .settings-info {
+            flex: 1;
+        }
+        
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background-color: var(--gray);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background-color: var(--primary);
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+        
+        .arrow-icon {
+            font-size: 1.5rem;
+            color: #666;
+        }
+        
+        @media (max-width: 480px) {
+            .rewards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .achievements-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         header {
@@ -71,13 +650,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        .cardheader {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }   
-        
         .profile-section {
             display: flex;
             align-items: center;
@@ -97,7 +669,7 @@
         
         .profile-info h3 {
             margin-bottom: 0.2rem;
-            color: var(--white);
+            color: var(--dark);
         }
         
         .points {
@@ -120,10 +692,10 @@
         }
         
         .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
+            margin: 1.5rem 0 1rem;
             color: var(--dark);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
         }
         
         .map-container {
@@ -405,18 +977,22 @@
 <body>
     <!-- Header -->
     <header>
-        <h1>EcoRewards</h1>
+        <h1>EcoDrop</h1>
     </header>
     
     <!-- Main Content -->
     <main>
         <!-- Profile Section -->
-        <div class="cardheader">
+        <div class="card">
             <div class="profile-section">
-                <div class="profile-pic">👤</div>
+                <div class="profile-pic">
+                  <img src="https://assets.onecompiler.app/43h5utmz2/43h8jyv7e/Screenshot%202025-05-09%20203649.png"
+                  alt="Foto Profil" 
+                  style="width: 80px; height: 60px; border-radius: 50%; object-fit: cover;"/>
+                </div>
                 <div class="profile-info">
-                    <h3>Selamat Datang, Greenzoicers</h3>
-                    <h5 style="color: white;">Member Sejak 10 April 2025</h5>
+                    <h3>Selamat Datang, Ryoga</h3>
+                    <p>Member Sejak 10 April 2025</p>
                 </div>
             </div>
             
@@ -432,7 +1008,8 @@
         <h3 class="section-title">Kiosk Terdekat</h3>
         <div class="card">
             <div class="map-container">
-                <img src="/api/placeholder/400/200" alt="Peta Kiosk Terdekat" />
+                <img src="https://assets.onecompiler.app/43h5utmz2/43h8jyv7e/Untitled%20design%20(1).png"
+                style="width: 100%; height: auto; max-height: 200px; object-fit: cover;" />
             </div>
             
             <ul class="kiosk-list">
@@ -584,34 +1161,402 @@
             
             <div class="scanner-box">
                 <div class="scanner-animation"></div>
-                <img src="/api/placeholder/300/250" alt="Scanner Camera" />
+                <img src="https://assets.onecompiler.app/43h5utmz2/43h8jyv7e/QR%20Code%20Grinjoik.jpg" alt="Scanner Camera" 
+                style="width: 250px; height: 250px; object-fit: cover; display: block; margin: 0 auto;" />
             </div>
             
             <button id="closeModalBtn" class="close-btn">Tutup</button>
         </div>
     </div>
     
+    <!-- All Pages Container -->
+    <div id="pages-container">
+        <!-- Home Page (default visible) -->
+        <div id="home-page" class="app-page active-page">
+            <!-- Content from the main section stays here -->
+        </div>
+        
+        <!-- Kiosk Page (Peta Interaktif Kiosk)--> 
+        <div id="kiosk-page" class="app-page">
+            <div class="card">
+                <h3 class="section-title">Temukan Kiosk</h3>
+                <div class="map-container" style="height: 300px;">
+                    <img src="https://assets.onecompiler.app/43h5utmz2/43h8jyv7e/Untitled%20design%20(1).png" 
+                    alt="Peta Kiosk Terdekat"  
+                    style="width: 100%; height: auto; max-height: 300px; object-fit: cover;" />
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" placeholder="Cari lokasi kiosk..." class="search-input">
+                    <button class="search-btn">🔍</button>
+                </div>
+                
+                <div class="filter-options">
+                    <span class="filter-label">Filter:</span>
+                    <span class="filter-badge active">Semua</span>
+                    <span class="filter-badge">Terdekat</span>
+                    <span class="filter-badge">Organik</span>
+                    <span class="filter-badge">Anorganik</span>
+                </div>
+                
+                <h4 class="sub-title">Kiosk Tersedia</h4>
+                <ul class="kiosk-list">
+                    <li class="kiosk-item">
+                        <div class="kiosk-icon">♻️</div>
+                        <div class="kiosk-info">
+                            <h4>Kiosk Taman Kota</h4>
+                            <p>Jl. Merdeka No. 10</p>
+                            <div class="kiosk-status">
+                                <span class="status-badge available">Tersedia</span>
+                                <span class="waste-type">Organik & Anorganik</span>
+                            </div>
+                        </div>
+                        <button class="direction-btn">🧭</button>
+                    </li>
+                    <li class="kiosk-item">
+                        <div class="kiosk-icon">♻️</div>
+                        <div class="kiosk-info">
+                            <h4>Kiosk Stasiun Pusat</h4>
+                            <p>Stasiun Pusat Lt. 1</p>
+                            <div class="kiosk-status">
+                                <span class="status-badge busy">Sibuk</span>
+                                <span class="waste-type">Organik & Anorganik</span>
+                            </div>
+                        </div>
+                        <button class="direction-btn">🧭</button>
+                    </li>
+                    <li class="kiosk-item">
+                        <div class="kiosk-icon">♻️</div>
+                        <div class="kiosk-info">
+                            <h4>Kiosk Alun-Alun</h4>
+                            <p>Alun-Alun Kota</p>
+                            <div class="kiosk-status">
+                                <span class="status-badge maintenance">Maintenance</span>
+                                <span class="waste-type">Organik</span>
+                            </div>
+                        </div>
+                        <button class="direction-btn">🧭</button>
+                    </li>
+                    <li class="kiosk-item">
+                        <div class="kiosk-icon">♻️</div>
+                        <div class="kiosk-info">
+                            <h4>Kiosk Monumen Kota</h4>
+                            <p>Jl. Pahlawan No. 25</p>
+                            <div class="kiosk-status">
+                                <span class="status-badge available">Tersedia</span>
+                                <span class="waste-type">Anorganik</span>
+                            </div>
+                        </div>
+                        <button class="direction-btn">🧭</button>
+                    </li>
+                </ul>
+                
+                <div class="info-card">
+                    <h4>Tips Penggunaan Kiosk</h4>
+                    <ul class="tips-list">
+                        <li>Pastikan sampah sudah terpilah sebelum datang ke kiosk</li>
+                        <li>Cek status kiosk sebelum mengunjungi untuk menghindari antrian</li>
+                        <li>Gunakan fitur navigasi untuk petunjuk arah ke kiosk terdekat</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rewards Page -->
+        <div id="rewards-page" class="app-page">
+            <div class="rewards-header card">
+                <div class="points-large">
+                    <h2>350</h2>
+                    <p>EcoCoins Anda</p>
+                </div>
+                <div class="level-info">
+                    <div class="level-badge">Level 3</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 70%;"></div>
+                    </div>
+                    <p>150 poin lagi untuk Level 4</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 class="section-title">Kategori Rewards</h3>
+                <div class="category-icons">
+                    <div class="category-item active">
+                        <div class="category-icon">🌱</div>
+                        <span>Pupuk</span>
+                    </div>
+                    <div class="category-item">
+                        <div class="category-icon">🧱</div>
+                        <span>Silica</span>
+                    </div>
+                    <div class="category-item">
+                        <div class="category-icon">🛒</div>
+                        <span>Voucher</span>
+                    </div>
+                    <div class="category-item">
+                        <div class="category-icon">🌟</div>
+                        <span>Populer</span>
+                    </div>
+                </div>
+                
+                <div class="rewards-grid">
+                    <div class="reward-card">
+                        <div class="reward-image">
+                            <span class="reward-badge">Best Seller</span>
+                        </div>
+                        <div class="reward-details">
+                            <h4>Pupuk Organik 1kg</h4>
+                            <p>PT EcoPupuk</p>
+                            <div class="reward-footer">
+                                <span class="reward-price">200 poin</span>
+                                <button class="claim-btn">Tukar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reward-card">
+                        <div class="reward-image">
+                            <span class="reward-badge">Hemat</span>
+                        </div>
+                        <div class="reward-details">
+                            <h4>Pupuk Organik 3kg</h4>
+                            <p>PT EcoPupuk</p>
+                            <div class="reward-footer">
+                                <span class="reward-price">500 poin</span>
+                                <button class="claim-btn">Tukar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reward-card">
+                        <div class="reward-image">
+                            <span class="reward-badge">Baru</span>
+                        </div>
+                        <div class="reward-details">
+                            <h4>Pupuk Khusus Tanaman Hias</h4>
+                            <p>PT EcoPupuk</p>
+                            <div class="reward-footer">
+                                <span class="reward-price">300 poin</span>
+                                <button class="claim-btn">Tukar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reward-card">
+                        <div class="reward-image">
+                        </div>
+                        <div class="reward-details">
+                            <h4>Pupuk Cair Organik</h4>
+                            <p>PT EcoPupuk</p>
+                            <div class="reward-footer">
+                                <span class="reward-price">250 poin</span>
+                                <button class="claim-btn">Tukar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="promo-banner">
+                    <h4>Promo Spesial!</h4>
+                    <p>Dapatkan diskon 20% poin untuk pupuk organik sampai 15 Mei 2025</p>
+                    <button class="promo-btn">Lihat Promo</button>
+                </div>
+                
+                <div class="reward-history">
+                    <h4 class="sub-title">Reward Terakhir Ditukar</h4>
+                    <div class="history-item">
+                        <div class="history-icon">🌱</div>
+                        <div class="history-info">
+                            <h4>Pupuk Organik 1kg</h4>
+                            <p>18 April 2025 - Kode: ECO182504</p>
+                        </div>
+                        <button class="small-btn">Detail</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Page -->
+        <div id="profile-page" class="app-page">
+            <div class="profile-header card">
+                <div class="profile-cover">
+                </div>
+                <div class="profile-main">
+                    <div class="profile-pic-large">
+                        <img src="https://assets.onecompiler.app/43h5utmz2/43h8jyv7e/Screenshot%202025-05-09%20203649.png" 
+                        alt="Foto Profil" 
+                        style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;" />
+                        </div> 
+                    <div class="profile-details">
+                        <h3>Ryoga Ariefa Dhaniswara</h3>
+                        <p class="profile-title">Eco Warrior</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-value">350</span>
+                                <span class="stat-label">Poin</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">28</span>
+                                <span class="stat-label">Setoran</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">5</span>
+                                <span class="stat-label">Rewards</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="edit-profile-btn">✏️</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 class="section-title">Achievements</h3>
+                <div class="achievements-grid">
+                    <div class="achievement-item unlocked">
+                        <div class="achievement-icon">🌱</div>
+                        <span class="achievement-name">First Drop</span>
+                    </div>
+                    <div class="achievement-item unlocked">
+                        <div class="achievement-icon">♻️</div>
+                        <span class="achievement-name">10x Recycler</span>
+                    </div>
+                    <div class="achievement-item unlocked">
+                        <div class="achievement-icon">📊</div>
+                        <span class="achievement-name">Eco Tracker</span>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">🏆</div>
+                        <span class="achievement-name">Eco Master</span>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">🌍</div>
+                        <span class="achievement-name">Earth Saver</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 class="section-title">Statistik Daur Ulang</h3>
+                <div class="stats-graph">
+                    <img src="/api/placeholder/400/200" alt="Grafik Statistik" />
+                </div>
+                <div class="stats-details">
+                    <div class="stat-row">
+                        <div class="stat-label">Sampah Organik</div>
+                        <div class="stat-bar">
+                            <div class="stat-progress organic" style="width: 65%;"></div>
+                        </div>
+                        <div class="stat-value">15.5 kg</div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-label">Sampah Plastik</div>
+                        <div class="stat-bar">
+                            <div class="stat-progress plastic" style="width: 40%;"></div>
+                        </div>
+                        <div class="stat-value">9.2 kg</div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-label">Sampah Kertas</div>
+                        <div class="stat-bar">
+                            <div class="stat-progress paper" style="width: 25%;"></div>
+                        </div>
+                        <div class="stat-value">6.8 kg</div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-label">Lainnya</div>
+                        <div class="stat-bar">
+                            <div class="stat-progress other" style="width: 15%;"></div>
+                        </div>
+                        <div class="stat-value">3.2 kg</div>
+                    </div>
+                </div>
+                <div class="impact-info">
+                    <h4>Dampak Lingkungan Anda</h4>
+                    <div class="impact-items">
+                        <div class="impact-item">
+                            <div class="impact-icon">🌳</div>
+                            <div class="impact-detail">
+                                <span class="impact-value">5</span>
+                                <span class="impact-label">Pohon Terselamatkan</span>
+                            </div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-icon">💧</div>
+                            <div class="impact-detail">
+                                <span class="impact-value">2.500</span>
+                                <span class="impact-label">Liter Air Terhemat</span>
+                            </div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-icon">⚡</div>
+                            <div class="impact-detail">
+                                <span class="impact-value">150</span>
+                                <span class="impact-label">kWh Energi Terhemat</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 class="section-title">Pengaturan</h3>
+                <ul class="settings-list">
+                    <li class="settings-item">
+                        <div class="settings-icon">🔔</div>
+                        <div class="settings-info">Notifikasi</div>
+                        <div class="toggle-switch active"></div>
+                    </li>
+                    <li class="settings-item">
+                        <div class="settings-icon">🔒</div>
+                        <div class="settings-info">Privasi Akun</div>
+                        <div class="arrow-icon">›</div>
+                    </li>
+                    <li class="settings-item">
+                        <div class="settings-icon">👨‍👩‍👧‍👦</div>
+                        <div class="settings-info">Undang Teman</div>
+                        <div class="arrow-icon">›</div>
+                    </li>
+                    <li class="settings-item">
+                        <div class="settings-icon">❓</div>
+                        <div class="settings-info">Bantuan & FAQ</div>
+                        <div class="arrow-icon">›</div>
+                    </li>
+                    <li class="settings-item">
+                        <div class="settings-icon">📝</div>
+                        <div class="settings-info">Syarat & Ketentuan</div>
+                        <div class="arrow-icon">›</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <a href="#" class="bottom-nav-item active">
+        <a href="#" class="bottom-nav-item active" data-page="home-page">
             <div class="bottom-nav-icon">🏠</div>
             <span>Beranda</span>
         </a>
-        <a href="#" class="bottom-nav-item">
+        <a href="#" class="bottom-nav-item" data-page="kiosk-page">
             <div class="bottom-nav-icon">♻️</div>
             <span>Kiosk</span>
         </a>
-        <a href="#" class="bottom-nav-item">
+        <a href="#" class="bottom-nav-item" data-page="rewards-page">
             <div class="bottom-nav-icon">🎁</div>
             <span>Rewards</span>
         </a>
-        <a href="#" class="bottom-nav-item">
-            <div class="bottom-nav-icon">👤</div>
+        <a href="#" class="bottom-nav-item" data-page="profile-page">
+            <div class="bottom-nav-icon">
+            <img src="https://assets.onecompiler.app/43h5utmz2/43h8jyv7e/Screenshot%202025-05-09%20203649.png" 
+                        alt="Foto Profil" 
+                        style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" />
+            </div>
             <span>Profil</span>
         </a>
     </div>
     
     <script>
+        // Move main content to home page
+        document.querySelector('#home-page').innerHTML = document.querySelector('main').innerHTML;
+        document.querySelector('main').innerHTML = document.querySelector('#pages-container').innerHTML;
+        
         // Tab switching functionality
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -625,18 +1570,57 @@
             });
         });
         
+        // Bottom navigation functionality
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active class from all nav items
+                document.querySelectorAll('.bottom-nav-item').forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                // Hide all pages
+                document.querySelectorAll('.app-page').forEach(page => {
+                    page.classList.remove('active-page');
+                });
+                
+                // Add active class to clicked nav item
+                item.classList.add('active');
+                
+                // Show the corresponding page
+                const pageId = item.getAttribute('data-page');
+                document.getElementById(pageId).classList.add('active-page');
+            });
+        });
+        
+        // Category selector in rewards page
+        document.querySelectorAll('.category-item').forEach(cat => {
+            cat.addEventListener('click', () => {
+                document.querySelectorAll('.category-item').forEach(c => {
+                    c.classList.remove('active');
+                });
+                cat.classList.add('active');
+                // Add logic to filter rewards based on category
+            });
+        });
+        
         // QR Scanner Modal
         const scannerModal = document.getElementById('scannerModal');
         const scanQrBtn = document.getElementById('scanQrBtn');
         const closeModalBtn = document.getElementById('closeModalBtn');
         
-        scanQrBtn.addEventListener('click', () => {
-            scannerModal.style.display = 'block';
-        });
+        if(scanQrBtn) {
+            scanQrBtn.addEventListener('click', () => {
+                scannerModal.style.display = 'block';
+            });
+        }
         
-        closeModalBtn.addEventListener('click', () => {
-            scannerModal.style.display = 'none';
-        });
+        if(closeModalBtn) {
+            closeModalBtn.addEventListener('click', () => {
+                scannerModal.style.display = 'none';
+            });
+        }
         
         window.addEventListener('click', (event) => {
             if (event.target === scannerModal) {
